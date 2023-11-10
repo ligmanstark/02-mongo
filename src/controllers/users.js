@@ -1,25 +1,67 @@
-const User = require('../models/user')
+ const User = require('../models/user');
 const getUsers = (request, response) => {
-	response.statusCode = 200;
-	response.send('hello users!');
+	return User.find({})
+		.then((data) => {
+			response.statusCode = 200;
+			response.send(data);
+		})
+		.catch((error) => {
+			response.statusCode = 404;
+			response.send(error.message);
+		});
 };
 const getUser = (request, response) => {
 	const { user_id } = request.params;
-	response.statusCode = 200;
-	response.send(`hello user with id - ${user_id}`);
+	console.log(user_id);
+	return User.findById(user_id)
+		.then((user) => {
+			response.statusCode = 200;
+			response.send(user);
+		})
+		.catch((error) => {
+			response.statusCode = 404;
+			response.send(error.message);
+		});
 };
 const createUser = (request, response) => {
-    return User.create({
-        ...response.body
-    }).then((user) => {
-        response.statusCode = 201
-        response.send(user)
-    })
+	return User.create({
+		...request.body,
+	})
+		.then((user) => {
+			response.statusCode = 201;
+			response.send(user);
+		})
+		.catch((error) => {
+			response.statusCode = 500;
+			response.send(error.message);
+		});
 };
 
-const updateUser = (request, response) => {};
+const updateUser = (request, response) => {
+	const { user_id } = request.params;
+	return User.findByIdAndUpdate(user_id, { ...request.body })
+		.then((user) => {
+			response.statusCode = 200;
+			response.send('user was update');
+		})
+		.catch((error) => {
+			response.statusCode = 500;
+			response.send(error.message);
+		});
+};
 
-const deleteUser = (request, response) => {};
+const deleteUser = (request, response) => {
+	const { user_id } = request.params;
+	return User.findByIdAndDelete(user_id, { ...request.body })
+		.then((user) => {
+			response.statusCode = 200;
+			response.send('user was delete');
+		})
+		.catch((error) => {
+			response.statusCode = 500;
+			response.send(error.message);
+		});
+};
 
 module.exports = {
 	getUsers,
@@ -28,4 +70,3 @@ module.exports = {
 	updateUser,
 	deleteUser,
 };
-
